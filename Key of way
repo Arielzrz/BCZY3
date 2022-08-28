@@ -1,0 +1,102 @@
+def find_shorted_path():
+    #顶点列表
+    node_list = ['A','B','C','D','E','F','G','H','I']
+
+    edge_list = [['A','B',  6],
+                 ['A', 'C', 4],
+                 ['A', 'D', 5],
+                 ['B', 'E', 1],
+                 ['C', 'E', 1],
+                 ['D', 'H', 2],
+                 ['E', 'F', 9],
+                 ['E', 'G', 7],
+                 ['F', 'I', 2],
+                 ['G', 'I', 4],
+                 ['H', 'I', 4],
+                 ]
+    '''计算各个顶点的Ve(v)最早发生时间'''
+
+    #找出图的起点
+    temp_start_list = []
+    for edge in edge_list:
+        temp_start_list.append(edge[1])
+    start_node = [x for x in node_list if x not in temp_start_list]
+    # print(start_node)
+
+    Ve_node_dict = {}
+    Ve_node_dict[start_node[0]] = 0
+
+    for node in node_list:
+        Ve_tempnode_list = []
+        for edge in edge_list:
+            if node == edge[1]:
+                temp_Ve_node_value = Ve_node_dict[edge[0]] + edge[2]
+                Ve_tempnode_list.append(temp_Ve_node_value)
+        if len(Ve_tempnode_list) == 0:
+            Ve_node_dict[node] = 0
+        if len(Ve_tempnode_list) == 1:
+            Ve_node_value = Ve_tempnode_list[0]
+            Ve_node_dict[node] = Ve_node_value
+        if len(Ve_tempnode_list) > 1:
+            Ve_node_value = max(Ve_tempnode_list)
+            Ve_node_dict[node] = Ve_node_value
+    print('Ve(v)最早发生时间:\n',Ve_node_dict,'\n')
+
+    '''计算各个顶点的Vl(v)最迟发生时间'''
+
+    #找出图的终点
+    temp_end_list = []
+    for edge in edge_list:
+        temp_end_list.append(edge[0])
+    end_node = [x for x in node_list if x not in temp_end_list]
+    # print(end_node)
+
+    Vl_node_dict = {}
+    Vl_node_dict[end_node[0]] = Ve_node_dict[end_node[0]]
+
+    reverse_edge_list = []
+    for i in range(len(edge_list)-1,-1,-1):
+        reverse_edge_list.append(edge_list[i])
+
+
+    for node in reversed(node_list):
+        Vl_tempnode_list = []
+        for edge in reverse_edge_list:
+            if node == edge[0]:
+                temp_Vl_node_value = Vl_node_dict[edge[1]] - edge[2]
+                Vl_tempnode_list.append(temp_Vl_node_value)
+        if len(Vl_tempnode_list) == 0:
+            Vl_node_dict[node] = Ve_node_dict[end_node[0]]
+        if len(Vl_tempnode_list) == 1:
+            Vl_node_value = Vl_tempnode_list[0]
+            Vl_node_dict[node] = Vl_node_value
+        if len(Vl_tempnode_list) > 1:
+            Vl_node_value = min(Vl_tempnode_list)
+            Vl_node_dict[node] = Vl_node_value
+    print('Vl(v)最迟发生时间:\n',Vl_node_dict,'\n')
+
+    '''计算各个边的e(a)最早发生时间'''
+
+    e_bian_dict = {}
+    for edge in edge_list:
+        e_bian_dict['{}-{}'.format(edge[0],edge[1])] = Ve_node_dict[edge[0]]
+    print('e(a)最早发生时间:\n',e_bian_dict,'\n')
+
+    '''计算各个边的l(a)最迟发生时间'''
+
+    l_bian_dict = {}
+    for edge in edge_list:
+        l_bian_dict['{}-{}'.format(edge[0],edge[1])] = Vl_node_dict[edge[1]] - edge[2]
+    print('l(a)最迟发生时间:\n',l_bian_dict,'\n')
+
+    '''计算时间余量d(a)'''
+
+    d_bian_dict = {}
+    for bian in e_bian_dict.keys():
+        d_bian_dict[bian] = l_bian_dict[bian] - e_bian_dict[bian]
+    print("d(a)时间余量:\n",d_bian_dict,'\n')
+
+    print("关键路径为：",[x for x in d_bian_dict if d_bian_dict[x] == 0])
+
+if __name__ == "__main__":
+    find_shorted_path()

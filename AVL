@@ -1,0 +1,171 @@
+# AVL树不适于删除的情况
+class AVLTreeNode(object):
+    def __init__(self, data):
+        self.data = data  # 数据
+        self.left: AVLTreeNode = None  # 左子树
+        self.right: AVLTreeNode = None  # 右子树
+        self.height = 1  # 树高度
+
+
+def get_data(node: AVLTreeNode):
+    return node.data
+
+
+def set_data(node: AVLTreeNode, data):
+    node.data = data
+
+
+# 获得树形结构
+def get_left_node(node: AVLTreeNode):
+    return node.left
+
+
+def get_right_node(node: AVLTreeNode):
+    return node.right
+
+
+def get_height(node: AVLTreeNode):
+    if node is None:
+        return 0
+    return node.height
+
+
+def get_max_node(node: AVLTreeNode):
+    temp_node = node
+    if temp_node.right is not None:
+        return get_max_node(temp_node.right)
+    else:
+        return temp_node
+
+
+def get_min_node(node: AVLTreeNode):
+    temp_node = node
+    if temp_node.left is not None:
+        return get_min_node(temp_node.left)
+    else:
+        return temp_node
+
+
+def get_node(node: AVLTreeNode, data):
+    temp_node: AVLTreeNode = node
+    while temp_node:
+        if data < temp_node.data:
+            temp_node = temp_node.left
+        elif data > temp_node.data:
+            temp_node = temp_node.right
+        else:
+            return temp_node
+    return None
+
+
+# 右旋：先记录待旋转节点的左节点，然后将左节点的right指向待旋转节点即可
+def right_rotate(node: AVLTreeNode):
+    head_node: AVLTreeNode = node.left
+    node.left = head_node.right  # 将父节点的右侧放在待旋转节点的左侧
+    head_node.right = node  # 将父节点的右指针指向待旋转节点
+    node.height = max(get_height(node.left), get_height(node.right)) + 1
+    head_node.height = max(get_height(head_node.left), get_height(head_node.right)) + 1
+    return head_node
+
+
+def left_rotate(node: AVLTreeNode):
+    head_node: AVLTreeNode = node.right
+    node.right = head_node.left
+    head_node.left = node
+    node.height = max(get_height(node.left), get_height(node.right)) + 1
+    head_node.height = max(get_height(head_node.left), get_height(head_node.right)) + 1
+    return head_node
+
+
+# 先左旋，再右旋
+def left_right_rotate(node: AVLTreeNode):
+    son_node = left_rotate(node.left)
+    node.left = son_node
+    return right_rotate(node)
+
+
+def right_left_rotate(node: AVLTreeNode):
+    son_node = right_rotate(node.right)
+    node.right = son_node
+    return left_rotate(node)
+
+
+# 左子树与右子树差距最大为1，否则及时调整
+def adjust_height(node: AVLTreeNode):
+    if get_height(node.right) - get_height(node.left) > 1:
+        if get_height(node.right.right) > get_height(node.right.left):
+            node = left_rotate(node)
+        else:
+            node = right_left_rotate(node)
+    elif get_height(node.left) - get_height(node.right) > 1:
+        if get_height(node.left.left) > get_height(node.left.right):
+            node = right_rotate(node)
+        else:
+            node = left_right_rotate(node)
+    else:
+        pass
+    return node
+
+
+def insert_node(node: AVLTreeNode, data):
+    if node is None:
+        return AVLTreeNode(data)
+    if (node.data is not None) and (data < node.data):  # 向左插入
+        node.left = insert_node(node.left, data)
+        node.height = max(get_height(node.left), get_height(node.right)) + 1
+        node = adjust_height(node)
+    elif (node.data is not None) and (data > node.data):  # 向右插入
+        node.right = insert_node(node.right, data)
+        node.height = max(get_height(node.left), get_height(node.right)) + 1
+        node = adjust_height(node)
+    else:
+        print('Can not insert same value')
+    return node
+
+
+def delete_node(node: AVLTreeNode, data):
+    if node is None:
+        return None
+    if (node is not None) and (data < node.data):  # 左侧查询
+        node.left = delete_node(node.left, data)
+        node = adjust_height(node)
+    elif (node is not None) and (data > node.data):  # 右侧查询
+        node.right = delete_node(node.right, data)
+        node = adjust_height(node)
+    else:  # 在这里删除
+        if (node.left is not None) and (node.right is not None):  # 左右节点都不为空
+            node.data = get_min_node(node.right).data
+            node.right = delete_node(node.right, node.data)
+        elif node.left is not None:  # 左节点不为空，右节点为空
+            node = node.left
+        else:  # 左节点为空，右节点未知
+            node = node.right
+    if node is not None:
+        node.height = max(get_height(node.left), get_height(node.right)) + 1
+        adjust_height(node)
+    return node
+
+
+def get_all(node: AVLTreeNode):
+    values = []
+
+    def add_values(values, node: AVLTreeNode):
+        if node is not None:
+            values = add_values(values, node.left)
+            values.append(node.data)
+            values = add_values(values,node.right)
+        return values
+
+    return add_values(values,node)
+
+def main():
+    root=AVLTreeNode(10)
+    number_list=(3,2,1,4,5,6,7,15,26,17)
+    for number in number_list:
+        root=insert_node(root,number)
+    all_values=get_all(root)
+    del_note=delete_node(root,3)
+    all_values=get_all(root)
+    pass
+if __name__=='__main__':
+    main()

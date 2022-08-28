@@ -1,0 +1,54 @@
+class BSTree():
+    def __init__(self, root):
+        self.root = root
+
+    def serach(self, value):
+        return self.BST_serach(self.root, value)
+
+    def insert(self, value):
+        self.BST_insert(self.root, value)
+
+    def print_tree(self):
+        self.BST_print(self.root)
+
+    def BST_insert(self, root, value):
+        if not root:  # 遇到空节点，即为插入位置
+            print("Insert!!!")
+            root = Node(value)
+            return
+        if root.value == value:  # 若该值已存在于二叉树中，插入失败
+            print("Existed!!!")
+            return
+        elif value < root.value:  # 若值小于根节点值，继续从左子树中查找插入位置
+            if not root.left:
+                print("Insert!!!")
+                root.left = Node(value)
+                return
+            self.BST_insert(root.left, value)
+        else:  # 否则，该值大于根节点的值，从右子树中查找插入位置
+            if not root.right:
+                print("Insert!!!")
+                root.right = Node(value)
+                return
+            self.BST_insert(root.right, value)
+            # 注：以上四句不可用 return self.BST_insert(root.right, value)代替
+            # 会出现节点无法插入的问题
+
+    def BST_serach(self, root, value):
+        if not root:  # 遇到空节点，未找到
+            return False
+        if root.value == value:  # 找到
+            return True
+        elif value < root.value:  # 若值小于根节点值，继续从左子树中查找
+            return self.BST_serach(root.left, value)
+        else:  # 否则，该值大于根节点的值，从右子树中查找
+            return self.BST_serach(root.right, value)
+
+    def BST_print(self, root):
+        """Middle Serach"""
+        if not root:
+            return
+
+        self.BST_print(root.left)
+        print(root.value)
+        self.BST_print(root.right)

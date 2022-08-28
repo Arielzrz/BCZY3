@@ -1,0 +1,52 @@
+#Kruskal算法
+# 构建边的类，有两个端点和权重属性
+class side:
+    def __init__(self, u, v, w):
+        self.u = u
+        self.v = v
+        self.w = w
+# 获取输入的点，并为每一个点打上唯一的标签
+n = int(input('请输入点的个数'))
+r = []
+for i in range(n):
+    r.append(i)
+# 查找每一个点的源头标签，通过更新路径节点实现压缩查找
+def ys(i):
+    if r[i] == i:
+        return i
+    else:
+        r[i] = ys(r[i])  # 查找的过程中更新了路径节点，方便下次查找。
+        return r[i]
+# 判断两个节点是否共源头，即是否已经在同一棵树
+def pd(u, v):
+    if ys(u) != ys(v):
+        r[ys(u)] = ys(v); return 1
+    else:
+        return 0
+# 构造列表存储side类，获取输入并进行相应的存储
+s = []
+print('请输入起始点和权重（逗号隔开,q结束）：')
+while True:
+    z = input()
+    if z.upper() == 'Q':
+        break
+    else:
+        a, b, c = eval(z)
+        s.append(side(a, b, c))
+# 将边按照权重属性排序
+s = sorted(s, key=lambda t: t.w)
+sum = 0  # 计算代价
+# 从小到大遍历side如果不同源就计入最小生成树标识新新属性为1否则为0
+for i in range(len(s)):
+    if (pd(s[i].u, s[i].v)):
+        sum += s[i].w
+        s[i].__dict__['pj'] = 1
+    else:
+        s[i].__dict__['pj'] = 0
+
+print('最小代价：', sum)
+# 按照‘pj'标识依次输出最小生成树的边
+print('最小生成树：')
+for i in range(len(s)):
+    if s[i].pj == 1:
+        print('{}->{}'.format(s[i].u, s[i].v), end=' ')

@@ -1,0 +1,118 @@
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.lchild = None
+        self.rchild = None
+
+
+class BST:
+    def __init__(self, node_list):
+        self.root = None
+        for node in node_list:
+            self.insert(node)
+
+    def search(self, data):
+        bt = self.root
+        while bt:
+            entry = bt.data
+            if data < entry:
+                bt = bt.lchild
+            elif data > entry:
+                bt = bt.rchild
+            else:
+                return entry
+        return False
+
+    def insert(self, data):
+        bt = self.root
+        if not bt:
+            self.root = Node(data)
+            return
+        while True:
+            entry = bt.data
+            if data < entry:
+                if bt.lchild is None:
+                    bt.lchild = Node(data)
+                    return
+                bt = bt.lchild
+            elif data > entry:
+                if bt.rchild is None:
+                    bt.rchild = Node(data)
+                    return
+                bt = bt.rchild
+            else:
+                bt.data = data
+                return
+
+    def front_visit(self, root):
+        if root == None:
+            return
+        print(root.data)
+        self.front_visit(root.lchild)
+        self.front_visit(root.rchild)
+
+    def delete(self, data):
+        parent, node = None, self.root
+        if not node:
+            print("the tree is null")
+            return False
+        while node and node.data != data:
+            parent = node
+            if data < node.data:
+                node = node.lchild
+            else:
+                node = node.rchild
+            if not node:
+                return
+        if parent != None and parent.lchild == node:
+            if node.lchild is None and node.rchild is None:
+                parent.lchild = None
+                del node
+            elif node.lchild != None and node.rchild is None:
+                parent.lchild = node.lchild
+                del node
+            elif node.rchild != None and node.lchild is None:
+                parent.lchild = node.rchild
+                del node
+            elif node.rchild != None and node.lchild != None:
+                r = node.lchild
+                p = node
+                while r.rchild:
+                    p = r
+                    r = r.rchild
+                r.lchild = node.lchild
+                r.rchild = node.rchild
+                parent.lchild = r
+                p.rchild = None
+                del node
+
+        elif parent != None and parent.rchild == node:
+            if node.lchild is None and node.rchild is None:
+                parent.rchild = None
+            elif node.lchild != None and node.rchild is None:
+                parent.rchild = node.lchild
+            elif node.rchild != None and node.lchild is None:
+                parent.rchild = node.rchild
+            elif node.rchild != None and node.lchild != None:
+                r = node.lchild
+                p = node
+                while r.rchild:
+                    p = r
+                    r = r.rchild
+                r.lchild = node.lchild
+                r.rchild = node.rchild
+                p.rchild = None
+                parent.rchild = r
+                del node
+        elif parent is None:
+            r = node.lchild
+            p = node
+            while r.rchild:
+                p = r
+                r = r.rchild
+            # return r.data,node.data
+            r.lchild = node.lchild
+            r.rchild = node.rchild
+            p.rchild = None
+            self.root = r
+            del node
